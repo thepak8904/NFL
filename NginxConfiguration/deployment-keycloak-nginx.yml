@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-keycloak
+  namespace: test-keycloak-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-keycloak
+  template:
+    metadata:
+      labels:
+        app: nginx-keycloak
+    spec:
+      containers:
+        - name: nginx
+          image: imagebank.azurecr.io/nginx-plus/base:latest
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: nginx-config-volume
+              mountPath: /etc/nginx/conf.d/
+      volumes:
+        - name: nginx-config-volume
+          configMap:
+            name: nginx-config
