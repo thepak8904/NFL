@@ -1,0 +1,198 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    meta.helm.sh/release-name: keycloak
+    meta.helm.sh/release-namespace: keycloak
+  creationTimestamp: "2025-03-27T04:28:04Z"
+  generation: 4
+  labels:
+    app.kubernetes.io/instance: keycloak
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/version: 17.0.1-legacy
+    helm.sh/chart: keycloak-18.10.0
+  name: keycloak
+  namespace: keycloak
+  resourceVersion: "6335134"
+  uid: 20284a24-412a-4d91-923b-fc4d285f01af
+spec:
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
+  podManagementPolicy: Parallel
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: keycloak
+      app.kubernetes.io/name: keycloak
+  serviceName: keycloak-headless
+  template:
+    metadata:
+      annotations:
+        checksum/config-startup: f875cea0a33f040d43f2834887e6a2fd3661e284623b699c10262fa2d1148bcf
+        checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/instance: keycloak
+        app.kubernetes.io/name: keycloak
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/component
+                  operator: NotIn
+                  values:
+                  - test
+                matchLabels:
+                  app.kubernetes.io/instance: keycloak
+                  app.kubernetes.io/name: keycloak
+              topologyKey: failure-domain.beta.kubernetes.io/zone
+            weight: 100
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app.kubernetes.io/component
+                operator: NotIn
+                values:
+                - test
+              matchLabels:
+                app.kubernetes.io/instance: keycloak
+                app.kubernetes.io/name: keycloak
+            topologyKey: kubernetes.io/hostname
+      containers:
+      - env:
+        - name: KEYCLOAK_USER
+          value: admin
+        - name: KEYCLOAK_PASSWORD
+          value: Admin@123
+        - name: DB_VENDOR
+          value: postgres
+        - name: DB_ADDR
+          value: keycloak-postgresql
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_DATABASE
+          value: keycloak
+        - name: DB_USER
+          value: keycloak
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: postgresql-password
+              name: keycloak-postgresql
+        image: quay.io/keycloak/keycloak:17.0.1-legacy
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /auth/
+            port: http
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: keycloak
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        - containerPort: 8443
+          name: https
+          protocol: TCP
+        - containerPort: 9990
+          name: http-management
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /auth/realms/master
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources: {}
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+        startupProbe:
+          failureThreshold: 60
+          httpGet:
+            path: /auth/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 1
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /opt/jboss/startup-scripts/keycloak.cli
+          name: startup
+          readOnly: true
+          subPath: keycloak.cli
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - |
+          echo 'Waiting for PostgreSQL to become ready...'
+
+          until printf "." && nc -z -w 2 keycloak-postgresql 5432; do
+              sleep 2;
+          done;
+
+          echo 'PostgreSQL OK ✓'
+        image: docker.io/busybox:1.32
+        imagePullPolicy: IfNotPresent
+        name: pgchecker
+        resources:
+          limits:
+            cpu: 20m
+            memory: 32Mi
+          requests:
+            cpu: 20m
+            memory: 32Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsGroup: 1000
+          runAsNonRoot: true
+          runAsUser: 1000
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 1000
+      serviceAccount: keycloak
+      serviceAccountName: keycloak
+      terminationGracePeriodSeconds: 60
+      volumes:
+      - configMap:
+          defaultMode: 365
+          items:
+          - key: keycloak.cli
+            path: keycloak.cli
+          name: keycloak-startup
+        name: startup
+  updateStrategy:
+    type: RollingUpdate
+status:
+  availableReplicas: 1
+  collisionCount: 0
+  currentReplicas: 1
+  currentRevision: keycloak-69fbbbb5b8
+  observedGeneration: 4
+  readyReplicas: 1
+  replicas: 1
+  updateRevision: keycloak-69fbbbb5b8
+  updatedReplicas: 1
