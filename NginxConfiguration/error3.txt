@@ -1,0 +1,29 @@
+Updating the configuration and installing your custom providers, if any. Please wait.
+2025-04-02 08:16:25,974 WARN  [io.qua.config] (build-3) Unrecognized configuration key "quarkus.smallrye-health.extensions.enabled" was provided; it will be ignored; verify that the dependency extension for this configuration is set or that you did not make a typo
+2025-04-02 08:16:27,541 INFO  [io.qua.hib.orm.dep.HibernateOrmProcessor] (build-5) A legacy persistence.xml file is present in the classpath. This file will be used to configure JPA/Hibernate ORM persistence units, and any configuration of the Hibernate ORM extension will be ignored. To ignore persistence.xml files instead, set the configuration property 'quarkus.hibernate-orm.persistence-xml.ignore' to 'true'.
+2025-04-02 08:16:31,320 INFO  [io.qua.dep.QuarkusAugmentor] (main) Quarkus augmentation completed in 6528ms
+Running the server in development mode. DO NOT use this configuration in production.
+2025-04-02 08:16:32,249 WARN  [io.quarkus.config] (main) Unrecognized configuration key "quarkus.smallrye-health.extensions.enabled" was provided; it will be ignored; verify that the dependency extension for this configuration is set or that you did not make a typo
+2025-04-02 08:16:34,482 INFO  [org.keycloak.quarkus.runtime.storage.infinispan.CacheManagerFactory] (ForkJoinPool.commonPool-worker-1) Starting Infinispan embedded cache manager
+2025-04-02 08:16:34,678 INFO  [org.infinispan.CONTAINER] (ForkJoinPool.commonPool-worker-1) Virtual threads support enabled
+2025-04-02 08:16:34,902 INFO  [org.infinispan.CONTAINER] (ForkJoinPool.commonPool-worker-1) ISPN000556: Starting user marshaller 'org.infinispan.commons.marshall.ImmutableProtoStreamMarshaller'
+2025-04-02 08:16:35,225 INFO  [org.infinispan.transaction.lookup.JBossStandaloneJTAManagerLookup] (ForkJoinPool.commonPool-worker-1) ISPN000107: Retrieving transaction manager Transaction: unknown
+2025-04-02 08:16:36,624 INFO  [org.keycloak.quarkus.runtime.storage.database.liquibase.QuarkusJpaUpdaterProvider] (main) Initializing database schema. Using changelog META-INF/jpa-changelog-master.xml
+2025-04-02 08:16:50,145 WARN  [io.agroal.pool] (main) Datasource '<default>': JDBC resources leaked: 3 ResultSet(s) and 0 Statement(s)
+2025-04-02 08:16:50,147 WARN  [io.agroal.pool] (main) Datasource '<default>': JDBC resources leaked: 156 ResultSet(s) and 0 Statement(s)
+2025-04-02 08:16:50,464 INFO  [org.keycloak.connections.infinispan.DefaultInfinispanConnectionProviderFactory] (main) Node name: node_124538, Site name: null
+2025-04-02 08:16:50,698 INFO  [org.keycloak.broker.provider.AbstractIdentityProviderMapper] (main) Registering class org.keycloak.broker.provider.mappersync.ConfigSyncEventListener
+2025-04-02 08:16:50,731 INFO  [org.keycloak.services] (main) KC-SERVICES0050: Initializing master realm
+2025-04-02 08:16:53,119 WARN  [org.keycloak.services] (main) KC-SERVICES0110: Environment variable 'KEYCLOAK_ADMIN' is deprecated, use 'KC_BOOTSTRAP_ADMIN_USERNAME' instead
+2025-04-02 08:16:53,119 WARN  [org.keycloak.services] (main) KC-SERVICES0110: Environment variable 'KEYCLOAK_ADMIN_PASSWORD' is deprecated, use 'KC_BOOTSTRAP_ADMIN_PASSWORD' instead
+2025-04-02 08:16:53,308 INFO  [org.keycloak.services] (main) KC-SERVICES0077: Created temporary admin user with username admin
+2025-04-02 08:16:53,345 WARN  [io.agroal.pool] (main) Datasource '<default>': JDBC resources leaked: 3 ResultSet(s) and 0 Statement(s)
+2025-04-02 08:16:53,443 INFO  [io.quarkus] (main) Keycloak 26.1.2 on JVM (powered by Quarkus 3.15.3) started in 22.012s. Listening on: http://0.0.0.0:8080
+2025-04-02 08:16:53,444 INFO  [io.quarkus] (main) Profile dev activated. 
+2025-04-02 08:16:53,444 INFO  [io.quarkus] (main) Installed features: [agroal, cdi, hibernate-orm, jdbc-postgresql, keycloak, narayana-jta, opentelemetry, reactive-routes, rest, rest-jackson, smallrye-context-propagation, vertx]
+2025-04-02 08:17:26,908 WARN  [org.keycloak.cookie.DefaultCookieProvider] (executor-thread-2) Non-secure context detected; cookies are not secured, and will not be available in cross-origin POST requests
+2025-04-02 08:17:28,666 WARN  [org.keycloak.cookie.DefaultCookieProvider] (executor-thread-2) Non-secure context detected; cookies are not secured, and will not be available in cross-origin POST requests
+2025-04-02 08:18:19,143 WARN  [org.keycloak.cookie.DefaultCookieProvider] (executor-thread-5) Non-secure context detected; cookies are not secured, and will not be available in cross-origin POST requests
+2025-04-02 08:18:20,805 WARN  [org.keycloak.cookie.DefaultCookieProvider] (executor-thread-7) Non-secure context detected; cookies are not secured, and will not be available in cross-origin POST requests
+2025-04-02 08:18:20,860 WARN  [org.keycloak.events] (executor-thread-7) type="RESTART_AUTHENTICATION_ERROR", realmId="496e211d-7053-4d3f-8ba4-2dd763068473", realmName="master", clientId="security-admin-console", userId="null", ipAddress="10.249.1.69", error="already_logged_in", response_type="code", redirect_uri="http://74.176.240.69:8080/admin/master/console/", redirected_to_client="true", response_mode="query"
+2025-04-02 08:18:22,673 WARN  [org.keycloak.cookie.DefaultCookieProvider] (executor-thread-5) Non-secure context detected; cookies are not secured, and will not be available in cross-origin POST requests
