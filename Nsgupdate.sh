@@ -57,25 +57,27 @@ az network nsg rule create \
   --output none
 echo "Azure Public IP rule added."
 
-# --- VNET CIDRs ---
-echo "Fetching VNet CIDRs in current subscription..."
+# --- REMOTE VNET CIDRs (Cross-subscription) ---
+REMOTE_VNET_FILE="remote_vnet_cidrs.txt"
 
-VNET_CIDRS=$(az network vnet list --query "[?location=='$LOCATION'].addressSpace.addressPrefixes[]" -o tsv | tr '\n' ' ')
-if [ -z "$VNET_CIDRS" ]; then
-  echo "No VNet CIDRs found in region $LOCATION."
+if [ ! -f "$REMOTE_VNET_FILE" ]; then
+  echo "Remote VNet CIDR file ($REMOTE_VNET_FILE) not found. Skipping cross-sub VNet rule."
 else
-  echo "Adding VNet CIDR rule..."
+  REMOTE_VNET_CIDRS=$(tr '\n' ' ' < "$REMOTE_VNET_FILE")
+
+  echo "Adding Cross-subscription VNet rule..."
   az network nsg rule create \
     --resource-group "$RG" \
     --nsg-name "$NSG" \
-    --name "Allow-VNetCIDRs" \
-    --priority $VNET_CIDR_PRIORITY \
+    --name "Allow-Remote-VNet" \
+    --priority 750 \
     --direction Inbound \
     --access Allow \
     --protocol "*" \
-    --source-address-prefixes $VNET_CIDRS \
+    --source-address-prefixes $REMOTE_VNET_CIDRS \
+    --destination-address-prefixes VirtualNetwork \
     --destination-port-ranges "*" \
-    --description "Allow internal VNet traffic in $LOCATION" \
+    --description "Allow traffic from external VNets (no peering)" \
     --output none
-  echo "VNet CIDR rule added."
+  echo "Remote VNet rule added."
 fi
