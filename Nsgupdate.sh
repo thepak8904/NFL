@@ -3,81 +3,84 @@
 read -p "Enter Resource Group: " RG
 read -p "Enter NSG Name: " NSG
 
-# Location is fixed
-LOCATION="japaneast"
-
-# Rule priorities
-ZSCALER_PRIORITY=500
-AZURE_PUBLIC_PRIORITY=600
-VNET_CIDR_PRIORITY=700
-
-# --- ZSCALER ---
+# File paths
 ZSCALER_FILE="zscaler_ips.txt"
-if [ ! -f "$ZSCALER_FILE" ]; then
-  echo "Zscaler IP file ($ZSCALER_FILE) not found!"
-  exit 1
-fi
-
-ZSCALER_IPS=$(tr '\n' ' ' < "$ZSCALER_FILE")
-echo "Adding Zscaler IP rule..."
-az network nsg rule create \
-  --resource-group "$RG" \
-  --nsg-name "$NSG" \
-  --name "Allow-Zscaler" \
-  --priority $ZSCALER_PRIORITY \
-  --direction Inbound \
-  --access Allow \
-  --protocol "*" \
-  --source-address-prefixes $ZSCALER_IPS \
-  --destination-port-ranges "*" \
-  --description "Allow Zscaler IPs on any port/protocol" \
-  --output none
-echo "Zscaler rule added."
-
-# --- AZURE PUBLIC IPs ---
 AZURE_PUBLIC_FILE="azure_public_ips.txt"
-if [ ! -f "$AZURE_PUBLIC_FILE" ]; then
-  echo "Azure Public IP file ($AZURE_PUBLIC_FILE) not found!"
-  exit 1
-fi
-
-AZURE_PUBLIC_IPS=$(tr '\n' ' ' < "$AZURE_PUBLIC_FILE")
-echo "Adding Azure Public IP rule..."
-az network nsg rule create \
-  --resource-group "$RG" \
-  --nsg-name "$NSG" \
-  --name "Allow-AzurePublic" \
-  --priority $AZURE_PUBLIC_PRIORITY \
-  --direction Inbound \
-  --access Allow \
-  --protocol "*" \
-  --source-address-prefixes $AZURE_PUBLIC_IPS \
-  --destination-port-ranges "*" \
-  --description "Allow Azure Public IPs" \
-  --output none
-echo "Azure Public IP rule added."
-
-# --- REMOTE VNET CIDRs (Cross-subscription) ---
 REMOTE_VNET_FILE="remote_vnet_cidrs.txt"
 
-if [ ! -f "$REMOTE_VNET_FILE" ]; then
-  echo "Remote VNet CIDR file ($REMOTE_VNET_FILE) not found. Skipping cross-sub VNet rule."
-else
-  REMOTE_VNET_CIDRS=$(tr '\n' ' ' < "$REMOTE_VNET_FILE")
+# Function to get next available priority
+get_next_priority() {
+  local BASE=$1
+  local USED_PRIORITIES=($(az network nsg rule list \
+    --resource-group "$RG" \
+    --nsg-name "$NSG" \
+    --query "[].priority" \
+    --output tsv))
 
-  echo "Adding Cross-subscription VNet rule..."
+  while [[ " ${USED_PRIORITIES[@]} " =~ " $BASE " ]]; do
+    BASE=$((BASE + 10))
+  done
+  echo $BASE
+}
+
+echo "Targeting NSG: $NSG in Resource Group: $RG"
+
+# ========== ZSCALER ==========
+if [ -f "$ZSCALER_FILE" ]; then
+  ZSCALER_IPS=$(tr '\n' ' ' < "$ZSCALER_FILE")
+  PRIORITY=$(get_next_priority 500)
+  echo "→ Adding Zscaler rule at priority $PRIORITY..."
+  az network nsg rule create \
+    --resource-group "$RG" \
+    --nsg-name "$NSG" \
+    --name "Allow-Zscaler" \
+    --priority $PRIORITY \
+    --direction Inbound \
+    --access Allow \
+    --protocol "*" \
+    --source-address-prefixes $ZSCALER_IPS \
+    --destination-port-ranges "*" \
+    --description "Allow Zscaler IPs" \
+    --output none
+fi
+
+# ========== AZURE PUBLIC ==========
+if [ -f "$AZURE_PUBLIC_FILE" ]; then
+  AZURE_IPS=$(tr '\n' ' ' < "$AZURE_PUBLIC_FILE")
+  PRIORITY=$(get_next_priority 600)
+  echo "→ Adding Azure Public IP rule at priority $PRIORITY..."
+  az network nsg rule create \
+    --resource-group "$RG" \
+    --nsg-name "$NSG" \
+    --name "Allow-AzurePublic" \
+    --priority $PRIORITY \
+    --direction Inbound \
+    --access Allow \
+    --protocol "*" \
+    --source-address-prefixes $AZURE_IPS \
+    --destination-port-ranges "*" \
+    --description "Allow Azure public IPs" \
+    --output none
+fi
+
+# ========== REMOTE VNET CIDRs ==========
+if [ -f "$REMOTE_VNET_FILE" ]; then
+  REMOTE_VNET_CIDRS=$(tr '\n' ' ' < "$REMOTE_VNET_FILE")
+  PRIORITY=$(get_next_priority 700)
+  echo "→ Adding Remote VNet rule at priority $PRIORITY..."
   az network nsg rule create \
     --resource-group "$RG" \
     --nsg-name "$NSG" \
     --name "Allow-Remote-VNet" \
-    --priority 750 \
+    --priority $PRIORITY \
     --direction Inbound \
     --access Allow \
     --protocol "*" \
     --source-address-prefixes $REMOTE_VNET_CIDRS \
     --destination-address-prefixes VirtualNetwork \
     --destination-port-ranges "*" \
-    --description "Allow traffic from external VNets (no peering)" \
+    --description "Allow traffic from remote VNets" \
     --output none
-  echo "Remote VNet rule added."
 fi
+
+echo "✅ All applicable rules added to NSG: $NSG"
