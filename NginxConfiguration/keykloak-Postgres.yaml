@@ -1,0 +1,252 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: keycloak-new
+  namespace: test-neonavi-nginx
+  uid: 871a329f-986f-4a97-9dea-292c941012d1
+  resourceVersion: '8575214'
+  generation: 7
+  creationTimestamp: '2025-04-02T01:24:33Z'
+  annotations:
+    deployment.kubernetes.io/revision: '7'
+  managedFields:
+    - manager: Mozilla
+      operation: Update
+      apiVersion: apps/v1
+      time: '2025-04-02T08:16:22Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:spec:
+          f:progressDeadlineSeconds: {}
+          f:replicas: {}
+          f:revisionHistoryLimit: {}
+          f:selector: {}
+          f:strategy:
+            f:rollingUpdate:
+              .: {}
+              f:maxSurge: {}
+              f:maxUnavailable: {}
+            f:type: {}
+          f:template:
+            f:metadata:
+              f:labels:
+                .: {}
+                f:app: {}
+            f:spec:
+              f:containers:
+                k:{"name":"keycloak-new-c"}:
+                  .: {}
+                  f:args: {}
+                  f:command: {}
+                  f:env:
+                    .: {}
+                    k:{"name":"DB_ADDR"}:
+                      .: {}
+                      f:name: {}
+                      f:value: {}
+                    k:{"name":"DB_DATABASE"}:
+                      .: {}
+                      f:name: {}
+                      f:value: {}
+                    k:{"name":"DB_PASSWORD"}:
+                      .: {}
+                      f:name: {}
+                      f:valueFrom:
+                        .: {}
+                        f:secretKeyRef: {}
+                    k:{"name":"DB_PORT"}:
+                      .: {}
+                      f:name: {}
+                      f:value: {}
+                    k:{"name":"DB_USER"}:
+                      .: {}
+                      f:name: {}
+                      f:value: {}
+                    k:{"name":"DB_VENDOR"}:
+                      .: {}
+                      f:name: {}
+                      f:value: {}
+                    k:{"name":"JDBC_PARAMS"}:
+                      .: {}
+                      f:name: {}
+                      f:value: {}
+                    k:{"name":"KC_DB"}:
+                      .: {}
+                      f:name: {}
+                      f:value: {}
+                    k:{"name":"KC_DB_PASSWORD"}:
+                      .: {}
+                      f:name: {}
+                      f:valueFrom:
+                        .: {}
+                        f:secretKeyRef: {}
+                    k:{"name":"KC_DB_URL"}:
+                      .: {}
+                      f:name: {}
+                      f:value: {}
+                    k:{"name":"KC_DB_USERNAME"}:
+                      .: {}
+                      f:name: {}
+                      f:value: {}
+                    k:{"name":"KEYCLOAK_ADMIN"}:
+                      .: {}
+                      f:name: {}
+                      f:value: {}
+                    k:{"name":"KEYCLOAK_ADMIN_PASSWORD"}:
+                      .: {}
+                      f:name: {}
+                      f:value: {}
+                    k:{"name":"KEYCLOAK_PASSWORD"}:
+                      .: {}
+                      f:name: {}
+                      f:value: {}
+                    k:{"name":"KEYCLOAK_USER"}:
+                      .: {}
+                      f:name: {}
+                      f:value: {}
+                  f:image: {}
+                  f:imagePullPolicy: {}
+                  f:name: {}
+                  f:ports:
+                    .: {}
+                    k:{"containerPort":8080,"protocol":"TCP"}:
+                      .: {}
+                      f:containerPort: {}
+                      f:protocol: {}
+                  f:resources: {}
+                  f:terminationMessagePath: {}
+                  f:terminationMessagePolicy: {}
+              f:dnsPolicy: {}
+              f:restartPolicy: {}
+              f:schedulerName: {}
+              f:securityContext: {}
+              f:terminationGracePeriodSeconds: {}
+    - manager: kube-controller-manager
+      operation: Update
+      apiVersion: apps/v1
+      time: '2025-04-02T08:35:34Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:annotations:
+            .: {}
+            f:deployment.kubernetes.io/revision: {}
+        f:status:
+          f:availableReplicas: {}
+          f:conditions:
+            .: {}
+            k:{"type":"Available"}:
+              .: {}
+              f:lastTransitionTime: {}
+              f:lastUpdateTime: {}
+              f:message: {}
+              f:reason: {}
+              f:status: {}
+              f:type: {}
+            k:{"type":"Progressing"}:
+              .: {}
+              f:lastTransitionTime: {}
+              f:lastUpdateTime: {}
+              f:message: {}
+              f:reason: {}
+              f:status: {}
+              f:type: {}
+          f:observedGeneration: {}
+          f:readyReplicas: {}
+          f:replicas: {}
+          f:updatedReplicas: {}
+      subresource: status
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak-new
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: keycloak-new
+    spec:
+      containers:
+        - name: keycloak-new-c
+          image: imagebank.azurecr.io/keyclock/base:latest
+          command:
+            - /opt/keycloak/bin/kc.sh
+          args:
+            - start-dev
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: DB_VENDOR
+              value: postgres
+            - name: DB_ADDR
+              value: postgres
+            - name: DB_PORT
+              value: '5432'
+            - name: DB_DATABASE
+              value: kcdb-main
+            - name: DB_USER
+              value: citus
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: db-password
+            - name: KEYCLOAK_ADMIN
+              value: admin
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              value: adminpaSs@1
+            - name: KEYCLOAK_USER
+              value: deePak
+            - name: KEYCLOAK_PASSWORD
+              value: admin@Dev1
+            - name: JDBC_PARAMS
+              value: sslmode=require
+            - name: KC_DB
+              value: postgres
+            - name: KC_DB_URL
+              value: >-
+                jdbc:postgresql://c-mykeycloakdb-main.p6jrxupryj7nsc.postgres.cosmos.azure.com:5432/kcdb-main?sslmode=require
+            - name: KC_DB_USERNAME
+              value: citus
+            - name: KC_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: db-password
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+status:
+  observedGeneration: 7
+  replicas: 1
+  updatedReplicas: 1
+  readyReplicas: 1
+  availableReplicas: 1
+  conditions:
+    - type: Progressing
+      status: 'True'
+      lastUpdateTime: '2025-04-02T08:16:23Z'
+      lastTransitionTime: '2025-04-02T01:24:33Z'
+      reason: NewReplicaSetAvailable
+      message: ReplicaSet "keycloak-new-68cb555b97" has successfully progressed.
+    - type: Available
+      status: 'True'
+      lastUpdateTime: '2025-04-02T08:35:34Z'
+      lastTransitionTime: '2025-04-02T08:35:34Z'
+      reason: MinimumReplicasAvailable
+      message: Deployment has minimum availability.
