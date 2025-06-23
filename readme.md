@@ -11,8 +11,46 @@ spec:
       storage: 10Gi
 
 
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: opx1-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  volumeName: opx1-pv
 
 
+
+
+
+
+
+
+
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: opx1-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  csi:
+    driver: file.csi.azure.com
+    readOnly: false
+    volumeHandle: <storage-account-name>#<file-share-name>
+    volumeAttributes:
+      storageAccount: <storage-account-name>
+    nodeStageSecretRef:
+      name: azure-secret
+      namespace: default
 
 
 
