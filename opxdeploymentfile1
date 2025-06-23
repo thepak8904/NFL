@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opx-files-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opx-files
+  template:
+    metadata:
+      labels:
+        app: opx-files
+    spec:
+      volumes:
+      - name: data-volume
+        emptyDir: {}
+
+      initContainers:
+      - name: init-downloader
+        image: mcr.microsoft.com/azure-cli
+        command:
+          - /bin/sh
+          - -c
+          - |
+            az login --identity &&
+            az storage blob download-batch \
+              --account-name <your-storage-account> \
+              --destination /app/data \
+              --source opx-files/opx1 \
+              --auth-mode login
+        volumeMounts:
+          - mountPath: /app/data
+            name: data-volume
+
+      containers:
+      - name: opx-main
+        image: <your-registry>/opx-files:latest
+        volumeMounts:
+          - mountPath: /app/data
+            name: data-volume
