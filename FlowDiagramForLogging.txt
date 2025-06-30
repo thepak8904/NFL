@@ -1,0 +1,44 @@
+                          Azure Logging Architecture (Real-Time + Long-Term)
+
++----------------------+                +-----------------------+                +---------------------------+
+|                      | Diagnostic    |                       | Query + Alert  |                           |
+|  Azure Resources     +-------------->+  Log Analytics        +--------------->+  Azure Monitor Alerts     |
+|  (Firewall, KV, AKS, | Settings      |  (Short-term logs)    |  (KQL Queries) |  (Email, Teams, Webhook)  |
+|  API Mgmt, etc.)     |               +----------+------------+                +---------------------------+
+|                      |                          |
++----------+-----------+                          |
+           |                                       |
+           |                                       ▼
+           |                             +---------+-----------+
+           |                             |  Event Hub          |
+           |                             |  (Stream diagnostic  |
+           |                             |   logs in real-time) |
+           |                             +---------+-----------+
+           |                                       |
+           |                                       ▼
+           |                             +---------+-----------+
+           |                             |  Datadog             |
+           |                             |  - Ingest via Agent  |
+           |                             |    or Event Hub API  |
+           |                             |  - Dashboards        |
+           |                             |  - Monitors          |
+           |                             |  - Alerting (live)   |
+           |                             +----------------------+
+           |
+           |  (Parallel log archive path)
+           ▼
++----------+-----------+
+|  Azure Storage       |
+|  (Blob Container)    |
+|  - Archive Tier      |
+|  - Lifecycle Rules   |
+|  - Immutability      |
++----------+-----------+
+           |
+           ▼
++----------+-----------+
+|  Long-Term Archive   |
+|  (7–10 Years)        |
+|  - Raw JSON Logs     |
+|  - Compliance, Audit |
++----------------------+
