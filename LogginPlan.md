@@ -2,6 +2,50 @@
 
 This document explains **what logs we should collect**, **why**, and **what actions we need to take**.
 
+
++-------------------+                 +-------------------+                 +--------------------------+
+|                   | Diagnostic     |                   | Diagnostic     |                          |
+| Azure Resources   +--------------->+ Log Analytics WS  +---------------->+ Azure Monitor Alerts     |
+| (Firewall, KV,    | Settings       | (Query + Alert)   | KQL, Alerts    | (email, webhook, etc.)   |
+| AKS, API Mgmt...) |                +--------+----------+                 +--------------------------+
+|                   |                         |
++--------+----------+                         |
+         |                                    |
+         |                                    ▼
+         |                           +--------+----------+
+         |                           | Event Hub         |
+         |                           | (Streaming logs)  |
+         |                           +--------+----------+
+         |                                    |
+         |                                    ▼
+         |                           +--------+----------+
+         |                           | Datadog           |
+         |                           | Ingest via Agent  |
+         |                           | or Event Hub API  |
+         |                           | - Dashboards      |
+         |                           | - Alerts          |
+         |                           | - Monitors        |
+         |                           +-------------------+
+         |
+         |  (parallel)
+         ▼
++--------+----------+
+| Azure Storage     |
+| (Blob Container)  |
+| - Archive Tier    |
+| - Lifecycle Mgmt  |
+| - Immutability    |
++--------+----------+
+         |
+         ▼
++--------+----------+
+| Long-Term Archive |
+| (10 Years)        |
+| - Raw JSON logs   |
+| - Compliance Use  |
++-------------------+
+
+
 ---
 
 ## 1. 必だと思うログ　(セキュリティや監査上、必須ログ)
